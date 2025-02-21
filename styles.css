@@ -7,9 +7,9 @@
     border: 1px solid #ddd;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
     background: #fff;
-    position: fixed;
-    bottom: 37px;
-    right: 4px;
+    position: absolute;
+    bottom: -380px;
+    right: -3px;
     font-family: Arial, sans-serif;
     overflow: hidden;
 }
