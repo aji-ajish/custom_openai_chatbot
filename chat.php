@@ -4,11 +4,11 @@ require_login();
 header('Content-Type: application/json');
 
 // Get settings from the admin panel
-$apikey = get_config('block_cusrom_openai_chatbot', 'apikey');
-$apiurl = get_config('block_cusrom_openai_chatbot', 'apiurl');
-$model = get_config('block_cusrom_openai_chatbot', 'model');
-$max_tokens = get_config('block_cusrom_openai_chatbot', 'max_tokens');
-$temperature = get_config('block_cusrom_openai_chatbot', 'temperature');
+$apikey = get_config('block_custom_openai_chatbot', 'apikey');
+$apiurl = get_config('block_custom_openai_chatbot', 'apiurl');
+$model = get_config('block_custom_openai_chatbot', 'model');
+$max_tokens = get_config('block_custom_openai_chatbot', 'max_tokens');
+$temperature = get_config('block_custom_openai_chatbot', 'temperature');
 
 if (!$apikey || !$apiurl || !$model) {
     echo json_encode(['error' => 'API settings are missing.']);

@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
         appendMessage(userMessage, "user-message");
         chatInput.value = "";
 
-        fetch(M.cfg.wwwroot + "/blocks/cusrom_openai_chatbot/chat.php", {
+        fetch(M.cfg.wwwroot + "/blocks/custom_openai_chatbot/chat.php", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
