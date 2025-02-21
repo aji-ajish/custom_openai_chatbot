@@ -70,14 +70,28 @@ $static_responses = [
     "what is your purpose" => "I'm here to assist you with information and answer your questions!"
 ];
 
-// Normalize input (remove punctuation, convert to lowercase)
-$normalized_message = strtolower(trim(preg_replace("/[^\w\s]/", "", $message)));
+// Normalize input function (Already in your code)
+function normalize_text($text) {
+    $text = strtolower($text); // Convert to lowercase
+    $text = preg_replace("/[^\w\s]/", "", $text); // Remove punctuation
+    return trim($text); // Remove extra spaces
+}
 
-// Check if the message matches a static response
-if (isset($static_responses[$normalized_message])) {
-    echo json_encode(['response' => $static_responses[$normalized_message]]);
+// Normalize user input
+$normalized_message = normalize_text($message);
+
+// Normalize static response keys (Ensure they match)
+$normalized_responses = [];
+foreach ($static_responses as $key => $response) {
+    $normalized_responses[normalize_text($key)] = $response;
+}
+
+// Now, check if normalized input exists in normalized responses
+if (isset($normalized_responses[$normalized_message])) {
+    echo json_encode(['response' => $normalized_responses[$normalized_message]]);
     exit;
 }
+
 
 // Call OpenAI API (only if not a static response)
 $ch = curl_init();
