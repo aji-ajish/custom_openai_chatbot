@@ -1,0 +1,80 @@
+#openai-chatbot-container {
+    width: 305px;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    background: #fff;
+    position: fixed;
+    bottom: 37px;
+    right: 4px;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+}
+
+#chat-header {
+    background: #0073e6;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+}
+
+#chat-messages {
+    flex-grow: 1;
+    padding: 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.chat-message {
+    max-width: 80%;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 14px;
+    word-wrap: break-word;
+}
+
+.user-message {
+    background: #0073e6;
+    color: white;
+    align-self: flex-end;
+}
+
+.bot-message {
+    background: #f1f1f1;
+    align-self: flex-start;
+}
+
+#chat-input-container {
+    display: flex;
+    padding: 10px;
+    background: #f9f9f9;
+}
+
+#chat-input {
+    flex-grow: 0.9;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    outline: none;
+}
+
+#send-btn {
+    background: #0073e6;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    margin-left: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+#send-btn:hover {
+    background: #005bb5;
+}

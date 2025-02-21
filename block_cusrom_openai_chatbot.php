@@ -14,17 +14,23 @@ class block_cusrom_openai_chatbot extends block_base {
 
         global $CFG;
         $this->content = new stdClass;
-        $this->content->text = '<div id="openai-chatbot-container">
-            <input type="text" id="chat-input" placeholder="Ask me something...">
-            <button id="send-btn">Send</button>
-            <div id="chat-output"></div>
+
+        // Chatbot UI
+        $this->content->text = '
+        <div id="openai-chatbot-container">
+            <div id="chat-messages"></div>
+            <div id="chat-input-container">
+                <input type="text" id="chat-input" placeholder="Type a message...">
+                <button id="send-btn">➤</button>
+            </div>
         </div>';
+
         $this->content->footer = '';
 
-        // Include JavaScript
+        // Include CSS and JavaScript
+        $this->page->requires->css(new moodle_url($CFG->wwwroot . '/blocks/cusrom_openai_chatbot/styles.css'));
         $this->page->requires->js(new moodle_url($CFG->wwwroot . '/blocks/cusrom_openai_chatbot/chat.js'));
 
         return $this->content;
     }
 }
-

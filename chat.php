@@ -11,7 +11,7 @@ $max_tokens = get_config('block_cusrom_openai_chatbot', 'max_tokens');
 $temperature = get_config('block_cusrom_openai_chatbot', 'temperature');
 
 if (!$apikey || !$apiurl || !$model) {
-    echo json_encode(['error' => 'API settings are missing. Configure them in Site Administration → Plugins → Blocks → Custom OpenAI Chatbot.']);
+    echo json_encode(['error' => 'API settings are missing.']);
     exit;
 }
 
@@ -42,10 +42,17 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, [
 
 $response = curl_exec($ch);
 $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$error = curl_error($ch);
 curl_close($ch);
 
+// Debugging output
 if ($httpcode !== 200) {
-    echo json_encode(['error' => 'Failed to connect to OpenAI.']);
+    echo json_encode([
+        'error' => 'Failed to connect to OpenAI.',
+        'http_code' => $httpcode,
+        'curl_error' => $error,
+        'api_response' => $response
+    ]);
     exit;
 }
 
