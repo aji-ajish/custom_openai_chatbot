@@ -50,6 +50,7 @@ class block_custom_openai_chatbot extends block_base {
         $this->page->requires->css(new moodle_url($CFG->wwwroot . '/blocks/custom_openai_chatbot/styles.css'));
         $this->page->requires->js(new moodle_url($CFG->wwwroot . '/blocks/custom_openai_chatbot/chat.js'));
 
+
         return $this->content;
     }
 }
