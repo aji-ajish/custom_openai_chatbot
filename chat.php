@@ -112,9 +112,10 @@ if ($httpcode !== 200) {
         $error_message = 'OpenAI server error. Please try again later.';
     }
 
-    // Log the error for debugging
+    // Log the error for administrators
     debugging("OpenAI API Error (HTTP $httpcode): $error | Response: $response", DEBUG_DEVELOPER);
 
+    // Send a generic error message to the user
     echo json_encode([
         'error' => $error_message,
         'http_code' => $httpcode,
@@ -123,6 +124,7 @@ if ($httpcode !== 200) {
     ]);
     exit;
 }
+
 
 
 // === Get Response from OpenAI === //
