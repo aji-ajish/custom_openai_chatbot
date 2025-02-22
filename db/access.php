@@ -10,7 +10,10 @@ $capabilities = [
     'block/custom_openai_chatbot:addinstance' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_BLOCK,
-        'archetypes' => ['manager' => CAP_ALLOW],
-        'clonepermissionsfrom' => 'moodle/site:manageblocks',
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        ],
+        'clonepermissionsfrom' => 'moodle/site:manageblocks'
     ],
 ];

@@ -26,6 +26,16 @@ class block_custom_openai_chatbot extends block_base {
         return true; // Enable settings page
     }
 
+    public function applicable_formats() {
+        return [
+            'all' => false,
+            'site' => true,
+            'course-view' => true, 
+            'mod' => true, // Ensure this is set to allow blocks in module pages
+        ];
+    }
+    
+
     public function get_content() {
         if ($this->content !== null) {
             return $this->content;

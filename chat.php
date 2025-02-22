@@ -77,7 +77,7 @@ function normalize_text($text) {
     return trim($text); // Remove extra spaces
 }
 
-// Normalize user input
+// Normalize input
 $normalized_message = normalize_text($message);
 
 // Normalize static response keys (Ensure they match)
@@ -93,7 +93,7 @@ if (isset($normalized_responses[$normalized_message])) {
 }
 
 
-// Call OpenAI API (only if not a static response)
+// Call OpenAI API
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $apiurl);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -145,5 +145,37 @@ if ($httpcode !== 200) {
 $result = json_decode($response, true);
 $reply = $result['choices'][0]['message']['content'] ?? 'No response from OpenAI.';
 
+// Check if the response is cut off (max tokens reached)
+if (strlen($reply) >= ($max_tokens - 50)) { 
+    // If the response is close to max_tokens, ask OpenAI to continue
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $apiurl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+        'model' => $model,
+        'messages' => [
+            ['role' => 'user', 'content' => $message],
+            ['role' => 'assistant', 'content' => $reply], // Provide previous response for context
+            ['role' => 'user', 'content' => "Continue the response."]
+        ],
+        'max_tokens' => (int)$max_tokens,
+        'temperature' => (float)$temperature
+    ]));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "Authorization: Bearer $apikey",
+        "Content-Type: application/json"
+    ]);
+
+    $followup_response = curl_exec($ch);
+    curl_close($ch);
+
+    $followup_result = json_decode($followup_response, true);
+    $followup_reply = $followup_result['choices'][0]['message']['content'] ?? '';
+
+    $reply .= " " . $followup_reply; // Append follow-up response
+}
+
+// Return final response
 echo json_encode(['response' => $reply]);
 exit;
