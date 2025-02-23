@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const chatInput = document.getElementById("chat-input");
     const sendButton = document.getElementById("send-btn");
     const chatMessages = document.getElementById("chat-messages");
+    const courseName = document.getElementById("course-name");
 
     function appendMessage(content, type) {
         let messageDiv = document.createElement("div");
@@ -13,6 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function sendMessage() {
         let userMessage = chatInput.value.trim();
+        let userCourseName = courseName.value.trim();
         if (userMessage === "") return;
 
         appendMessage(userMessage, "user-message");
@@ -23,7 +25,10 @@ document.addEventListener("DOMContentLoaded", function () {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ message: userMessage }),
+            body: JSON.stringify({ 
+                message: userMessage,
+                courseName: userCourseName 
+            }),
         })
             .then(response => response.json())
             .then(data => {

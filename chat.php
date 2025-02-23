@@ -29,11 +29,14 @@ if (!$apikey || !$apiurl || !$model) {
 // Get user input
 $data = json_decode(file_get_contents("php://input"), true);
 $message = $data['message'] ?? '';
+$course_name = $data['courseName'] ?? '';
 
 if (empty($message)) {
     echo json_encode(['error' => 'Message cannot be empty.']);
     exit;
 }
+
+$modified_message = "This question is related to the '$course_name' course. Please provide an answer based on this course. Question: $message";
 
 // Static Responses (Avoid API Calls for Common Questions)
 $static_responses = [
@@ -100,7 +103,7 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($ch, CURLOPT_POST, 1);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
     'model' => $model,
-    'messages' => [['role' => 'user', 'content' => $message]],
+    'messages' => [['role' => 'user', 'content' => $modified_message]],
     'max_tokens' => (int)$max_tokens,
     'temperature' => (float)$temperature
 ]));

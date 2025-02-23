@@ -37,11 +37,14 @@ class block_custom_openai_chatbot extends block_base {
     
 
     public function get_content() {
+        global $COURSE, $USER, $CFG;
+
         if ($this->content !== null) {
             return $this->content;
         }
 
-        global $CFG;
+        $course_name = isset($COURSE->fullname) ? $COURSE->shortname : 'General';
+        
         $this->content = new stdClass;
 
         // Chatbot UI
@@ -49,6 +52,7 @@ class block_custom_openai_chatbot extends block_base {
         <div id="openai-chatbot-container">
             <div id="chat-messages"></div>
             <div id="chat-input-container">
+                <input type="hidden" id="course-name" value="' . htmlspecialchars($course_name, ENT_QUOTES) . '">
                 <input type="text" id="chat-input" placeholder="Type a message...">
                 <button id="send-btn">➤</button>
             </div>
