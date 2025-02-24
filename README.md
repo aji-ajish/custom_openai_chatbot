@@ -24,6 +24,10 @@ A **Moodle block plugin** that integrates **OpenAI's ChatGPT API**.
 - Users can send messages and receive AI-generated responses.
 
 ## Screenshots
-![Chatbot UI](screenshot.png)
+![Screenshot from 2025-02-24 09-52-20](https://github.com/user-attachments/assets/c6a8490f-d38e-4fbf-a25f-c8e6cda55a1a)
+
+![Screenshot from 2025-02-24 09-52-23](https://github.com/user-attachments/assets/93a9209a-77dd-4631-8d59-8c80b67cc9ba)
+
+
 
 
