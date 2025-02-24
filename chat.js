@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (data.response) {
                     appendMessage(data.response, "bot-message");
                 } else {
-                    appendMessage("Error: Unable to get response", "bot-message");
+                    appendMessage(data.error || "Error: Unable to get response", "bot-message");
                 }
             })
             .catch(() => {
