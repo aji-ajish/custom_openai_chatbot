@@ -12,6 +12,7 @@
     right: -3px;
     font-family: Arial, sans-serif;
     overflow: hidden;
+    transition: bottom 0.3s ease-in-out;
 }
 
 #chat-header {
@@ -31,25 +32,52 @@
     gap: 5px;
 }
 
+/* Chat Messages */
 .chat-message {
     max-width: 80%;
-    padding: 8px;
+    padding: 8px 12px;
     border-radius: 8px;
     font-size: 14px;
     word-wrap: break-word;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeIn 0.3s forwards;
 }
 
+/* User Message */
 .user-message {
     background: #0073e6;
     color: white;
     align-self: flex-end;
 }
 
+/* AI Bot Message */
 .bot-message {
     background: #f1f1f1;
     align-self: flex-start;
 }
 
+/* Typing Animation */
+.typing-indicator {
+    display: flex;
+    gap: 4px;
+    padding: 5px;
+    align-self: flex-start;
+}
+
+.typing-indicator span {
+    width: 8px;
+    height: 8px;
+    background-color: gray;
+    border-radius: 50%;
+    animation: typing 1.5s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: 0s; }
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+/* Chat Input Container */
 #chat-input-container {
     display: flex;
     padding: 10px;
@@ -57,13 +85,14 @@
 }
 
 #chat-input {
-    flex-grow: 0.9;
+    flex-grow: 1;
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 5px;
     outline: none;
 }
 
+/* Send Button */
 #send-btn {
     background: #0073e6;
     color: white;
@@ -73,13 +102,32 @@
     cursor: pointer;
     border-radius: 5px;
     font-size: 16px;
+    transition: background 0.2s;
 }
 
 #send-btn:hover {
     background: #005bb5;
 }
 
-/* In styles.css */
+/* Fade-in Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Typing Animation */
+@keyframes typing {
+    0%, 100% { opacity: 0.3; transform: translateY(0px); }
+    50% { opacity: 1; transform: translateY(-5px); }
+}
+
+/* Responsive Design */
 @media (max-width: 600px) {
     #openai-chatbot-container {
         width: 100%;

@@ -12,6 +12,15 @@ document.addEventListener("DOMContentLoaded", function () {
         chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll
     }
 
+    function showTypingIndicator() {
+        let typingDiv = document.createElement("div");
+        typingDiv.classList.add("chat-message", "typing-indicator");
+        typingDiv.innerHTML = "<span></span><span></span><span></span>";
+        chatMessages.appendChild(typingDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        return typingDiv; // Return the typing indicator for later removal
+    }
+
     function sendMessage() {
         let userMessage = chatInput.value.trim();
         let userCourseName = courseName.value.trim();
@@ -19,6 +28,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         appendMessage(userMessage, "user-message");
         chatInput.value = "";
+
+        let typingIndicator = showTypingIndicator(); // Show typing animation
 
         fetch(M.cfg.wwwroot + "/blocks/custom_openai_chatbot/chat.php", {
             method: "POST",
@@ -32,6 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
             .then(response => response.json())
             .then(data => {
+                chatMessages.removeChild(typingIndicator); // Remove typing animation
                 if (data.response) {
                     appendMessage(data.response, "bot-message");
                 } else {
@@ -39,6 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             })
             .catch(() => {
+                chatMessages.removeChild(typingIndicator); // Remove typing animation
                 appendMessage("Error: Unable to connect to AI", "bot-message");
             });
     }
