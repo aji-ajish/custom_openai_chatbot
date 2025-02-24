@@ -30,6 +30,9 @@ if (!$apikey || !$apiurl || !$model) {
 $data = json_decode(file_get_contents("php://input"), true);
 $message = $data['message'] ?? '';
 $course_name = $data['courseName'] ?? '';
+$course_id = $data['courseId'] ?? '';
+$user_id = $data['userId'] ?? '';
+
 
 if (empty($message)) {
     echo json_encode(['error' => 'Message cannot be empty.']);
@@ -91,7 +94,10 @@ foreach ($static_responses as $key => $response) {
 
 // Now, check if normalized input exists in normalized responses
 if (isset($normalized_responses[$normalized_message])) {
-    echo json_encode(['response' => $normalized_responses[$normalized_message]]);
+    $response = $normalized_responses[$normalized_message];
+    // Save the static response in the database
+    save_chat_history($user_id, $course_id, $message, $response, 'static');
+    echo json_encode(['response' => $response]);
     exit;
 }
 
@@ -179,6 +185,35 @@ if (strlen($reply) >= ($max_tokens - 50)) {
     $reply .= " " . $followup_reply; // Append follow-up response
 }
 
+// Save the API response in the database
+save_chat_history($user_id, $course_id, $message, $reply, 'api');
 // Return final response
 echo json_encode(['response' => $reply]);
 exit;
+
+function save_chat_history($userid, $courseid, $message, $response, $response_type) {
+    global $DB;
+
+    // Prepare the record object
+    $record = new stdClass();
+    $record->userid = $userid;
+    $record->courseid = $courseid;
+    $record->message = $message;
+    $record->response = $response;
+    $record->response_type = $response_type;
+
+    // Assign the current Unix timestamp to the timecreated field
+    $record->timecreated = time();  // This stores the current Unix timestamp
+
+    try {
+        // Insert the record into the chatbot_history table
+        $DB->insert_record('chatbot_history', $record);
+    } catch (Exception $e) {
+        // Handle the error and debug it
+        debugging("Error: " . $e->getMessage(), DEBUG_DEVELOPER);
+        throw $e;
+    }
+}
+
+
+

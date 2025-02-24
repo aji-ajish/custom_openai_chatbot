@@ -3,6 +3,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const sendButton = document.getElementById("send-btn");
     const chatMessages = document.getElementById("chat-messages");
     const courseName = document.getElementById("course-name");
+    const courseId = document.getElementById("course-id");
+    const userId = document.getElementById("user-id");
 
     function appendMessage(content, type) {
         let messageDiv = document.createElement("div");
@@ -24,6 +26,8 @@ document.addEventListener("DOMContentLoaded", function () {
     function sendMessage() {
         let userMessage = chatInput.value.trim();
         let userCourseName = courseName.value.trim();
+        let userCourseId = courseId.value.trim();
+        let courseUserId = userId.value.trim();
         if (userMessage === "") return;
 
         appendMessage(userMessage, "user-message");
@@ -38,7 +42,9 @@ document.addEventListener("DOMContentLoaded", function () {
             },
             body: JSON.stringify({ 
                 message: userMessage,
-                courseName: userCourseName 
+                courseName: userCourseName,
+                courseId: userCourseId,
+                userId: courseUserId 
             }),
         })
             .then(response => response.json())
