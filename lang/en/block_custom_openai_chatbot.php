@@ -16,7 +16,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Custom OpenAI Chatbot';
+$string['pluginname'] = 'OpenAI Chatbot';
 $string['apikey'] = 'OpenAI API Key';
 $string['apiurl'] = 'OpenAI API Endpoint';
 $string['model'] = 'OpenAI Model';

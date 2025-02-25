@@ -39,10 +39,7 @@ if (empty($message)) {
     exit;
 }
 
-$modified_message = "This question is about '$course_name.' Please answer accordingly: $message.";
-
-
-// Static Responses (Avoid API Calls for Common Questions)
+// Check for predefined static responses
 $static_responses = [
     "hi" => "Hello! How can I assist you today? 😊",
     "hello" => "Hi there! What can I do for you?",
@@ -102,6 +99,10 @@ if (isset($normalized_responses[$normalized_message])) {
     exit;
 }
 
+// Retrieve last 5 messages from chat history for context
+$context_messages = get_chat_context($user_id, $course_id, 5);
+$context_messages[] = ['role' => 'user', 'content' => "User is asking about '$course_name'. Question: $message"];
+
 
 // Call OpenAI API
 $ch = curl_init();
@@ -110,7 +111,7 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($ch, CURLOPT_POST, 1);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
     'model' => $model,
-    'messages' => [['role' => 'user', 'content' => $modified_message]],
+    'messages' => $context_messages,
     'max_tokens' => (int)$max_tokens,
     'temperature' => (float)$temperature
 ]));
@@ -155,64 +156,53 @@ if ($httpcode !== 200) {
 $result = json_decode($response, true);
 $reply = $result['choices'][0]['message']['content'] ?? 'No response from OpenAI.';
 
-// Check if the response is cut off (max tokens reached)
-if (strlen($reply) >= ($max_tokens - 50)) { 
-    // If the response is close to max_tokens, ask OpenAI to continue
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $apiurl);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-        'model' => $model,
-        'messages' => [
-            ['role' => 'user', 'content' => $message],
-            ['role' => 'assistant', 'content' => $reply], // Provide previous response for context
-            ['role' => 'user', 'content' => "Continue the response."]
-        ],
-        'max_tokens' => (int)$max_tokens,
-        'temperature' => (float)$temperature
-    ]));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        "Authorization: Bearer $apikey",
-        "Content-Type: application/json"
-    ]);
-
-    $followup_response = curl_exec($ch);
-    curl_close($ch);
-
-    $followup_result = json_decode($followup_response, true);
-    $followup_reply = $followup_result['choices'][0]['message']['content'] ?? '';
-
-    $reply .= " " . $followup_reply; // Append follow-up response
-}
-
 // Save the API response in the database
 save_chat_history($user_id, $course_id, $message, $reply, 'api');
 // Return final response
 echo json_encode(['response' => $reply]);
 exit;
 
+/**
+ * Retrieve the last N chat messages for a user in a course.
+ */
+function get_chat_context($userid, $courseid, $limit = 5) {
+    global $DB;
+    $context = [];
+
+    $sql = "SELECT message, response FROM {chatbot_history} 
+            WHERE userid = ? AND courseid = ? AND response_type = 'api'
+            ORDER BY timecreated ASC 
+            LIMIT " . intval($limit);
+
+        $records = $DB->get_records_sql($sql, [$userid, $courseid]);
+    
+
+    foreach ($records as $record) {
+        $context[] = ['role' => 'user', 'content' => trim($record->message)];
+        $context[] = ['role' => 'assistant', 'content' => trim($record->response)];
+    }
+
+    return $context; // Keep order as-is
+}
+
+/**
+ * Save chat history to the database.
+ */
 function save_chat_history($userid, $courseid, $message, $response, $response_type) {
     global $DB;
-
-    // Prepare the record object
-    $record = new stdClass();
-    $record->userid = $userid;
-    $record->courseid = $courseid;
-    $record->message = $message;
-    $record->response = $response;
-    $record->response_type = $response_type;
-
-    // Assign the current Unix timestamp to the timecreated field
-    $record->timecreated = time();  // This stores the current Unix timestamp
+    $record = (object) [
+        'userid' => $userid,
+        'courseid' => $courseid,
+        'message' => $message,
+        'response' => $response,
+        'response_type' => $response_type,
+        'timecreated' => time(),
+    ];
 
     try {
-        // Insert the record into the chatbot_history table
         $DB->insert_record('chatbot_history', $record);
     } catch (Exception $e) {
-        // Handle the error and debug it
-        debugging("Error: " . $e->getMessage(), DEBUG_DEVELOPER);
-        throw $e;
+        debugging("Database Error: " . $e->getMessage(), DEBUG_DEVELOPER);
     }
 }
 
