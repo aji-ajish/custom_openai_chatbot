@@ -37,7 +37,7 @@ class block_custom_openai_chatbot extends block_base {
     
 
     public function get_content() {
-        global $COURSE, $USER, $CFG;
+        global $COURSE, $USER, $CFG, $DB;
 
         if ($this->content !== null) {
             return $this->content;
@@ -46,13 +46,34 @@ class block_custom_openai_chatbot extends block_base {
         $course_name = isset($COURSE->fullname) ? $COURSE->shortname : 'General';
         $course_id = isset($COURSE->fullname) ? $COURSE->id : 'General';
         $user_id = $USER->id;
+
+        // Retrieve previous chat history for the user and course
+
+        $sql = "SELECT * FROM {chatbot_history} 
+        WHERE userid = :userid AND courseid = :courseid 
+        ORDER BY timecreated ASC";
+
+        $params = ['userid' => $USER->id, 'courseid' => $COURSE->id];
+
+        $history = $DB->get_records_sql($sql, $params);
+
+        // Display the chat history
+        $history_html = '';
+        foreach ($history as $record) {
+            $history_html .= '<div class="chat-message user-message" style="margin-top: 5px;margin-bottom: 5px;">' . format_text($record->message, FORMAT_PLAIN) . '</div>';
+            
+            if (!empty($record->response)) {
+                $history_html .= '<div class="chat-message bot-message">' . format_text($record->response, FORMAT_PLAIN) . '</div>';
+            }
+            
+        }
         
         $this->content = new stdClass;
 
         // Chatbot UI
         $this->content->text = '
         <div id="openai-chatbot-container">
-            <div id="chat-messages"></div>
+            <div id="chat-messages">' . $history_html . '</div>
             <div id="chat-input-container">
                 <input type="hidden" id="course-name" value="' . htmlspecialchars($course_name, ENT_QUOTES) . '">
                 <input type="hidden" id="course-id" value="' . htmlspecialchars($course_id, ENT_QUOTES) . '">

@@ -9,6 +9,12 @@ document.addEventListener("DOMContentLoaded", function () {
     function appendMessage(content, type) {
         let messageDiv = document.createElement("div");
         messageDiv.classList.add("chat-message", type);
+        if(type==='user-message'){
+            messageDiv.classList.add("chat-message", type);
+            messageDiv.setAttribute("style", "margin-top: 5px;margin-bottom: 5px;");
+        }else{
+            messageDiv.classList.add("chat-message", type);
+        }
         messageDiv.textContent = content;
         chatMessages.appendChild(messageDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll
