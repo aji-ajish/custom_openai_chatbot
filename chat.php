@@ -101,7 +101,11 @@ if (isset($normalized_responses[$normalized_message])) {
 
 // Retrieve last 5 messages from chat history for context
 $context_messages = get_chat_context($user_id, $course_id, 5);
-$context_messages[] = ['role' => 'user', 'content' => "User is asking about '$course_name'. Question: $message"];
+$context_messages[] = [
+    'role' => 'user',
+    'content' => "The user is currently enrolled in the course '$course_name'. They should only receive responses related to this course. If the question is not relevant, politely refuse to answer. User's question: $message"
+];
+
 
 
 // Call OpenAI API
