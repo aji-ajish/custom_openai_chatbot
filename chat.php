@@ -39,7 +39,8 @@ if (empty($message)) {
     exit;
 }
 
-$modified_message = "This question is related to the '$course_name' course. Please provide an answer based on this course. Question: $message";
+$modified_message = "This question is about '$course_name.' Please answer accordingly: $message.";
+
 
 // Static Responses (Avoid API Calls for Common Questions)
 $static_responses = [
