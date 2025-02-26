@@ -16,7 +16,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'OpenAI Chatbot';
+$string['custom_openai_chatbot:addinstance'] = 'Add a new Custom OpenAI Chatbot block';
+$string['custom_openai_chatbot:myaddinstance'] = 'Add a new Custom OpenAI Chatbot block to My Moodle page';
+
+
+$string['pluginname'] = 'Custom OpenAI Chatbot';
 $string['apikey'] = 'OpenAI API Key';
 $string['apiurl'] = 'OpenAI API Endpoint';
 $string['model'] = 'OpenAI Model';

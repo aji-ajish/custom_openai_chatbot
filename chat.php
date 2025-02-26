@@ -130,27 +130,8 @@ $error = curl_error($ch);
 curl_close($ch);
 
 // Error Handling
-if ($httpcode !== 200) {
-    $error_message = 'Failed to connect to OpenAI.';
-
-    if ($httpcode === 401) {
-        $error_message = 'Invalid API key. Please check your settings.';
-    } elseif ($httpcode === 429) {
-        $error_message = 'Too many requests. OpenAI API rate limit exceeded.';
-    } elseif ($httpcode === 500) {
-        $error_message = 'OpenAI server error. Please try again later.';
-    }
-
-    // Log the error for administrators
-    debugging("OpenAI API Error (HTTP $httpcode): $error | Response: $response", DEBUG_DEVELOPER);
-
-    // Send a generic error message to the user
-    echo json_encode([
-        'error' => $error_message,
-        'http_code' => $httpcode,
-        'curl_error' => $error,
-        'api_response' => $response
-    ]);
+if ($response === false) {
+    echo json_encode(['error' => 'Failed to connect to OpenAI.', 'curl_error' => $error]);
     exit;
 }
 
@@ -173,21 +154,21 @@ function get_chat_context($userid, $courseid, $limit = 5) {
     global $DB;
     $context = [];
 
-    $sql = "SELECT message, response FROM {chatbot_history} 
+    $sql = "SELECT id, message, response FROM {chatbot_history} 
             WHERE userid = ? AND courseid = ? AND response_type = 'api'
             ORDER BY timecreated ASC 
             LIMIT " . intval($limit);
 
-        $records = $DB->get_records_sql($sql, [$userid, $courseid]);
-    
+    $records = $DB->get_records_sql($sql, [$userid, $courseid]);
 
     foreach ($records as $record) {
         $context[] = ['role' => 'user', 'content' => trim($record->message)];
         $context[] = ['role' => 'assistant', 'content' => trim($record->response)];
     }
 
-    return $context; // Keep order as-is
+    return $context;
 }
+
 
 /**
  * Save chat history to the database.
