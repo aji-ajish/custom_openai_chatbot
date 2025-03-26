@@ -18,39 +18,39 @@ if ($hassiteconfig) { // Ensures the settings are only added once
 
     // OpenAI API URL
     $settings->add(new admin_setting_configtext(
-        'block_custom_openai_chatbot/apiurl',
+        'block_custom_openai_chatbot/process_query_api',
         'OpenAI API Endpoint',
         'Enter the OpenAI API URL.',
-        'https://api.openai.com/v1/chat/completions',
+        '',
         PARAM_URL
     ));
 
-    // OpenAI Model
+
     $settings->add(new admin_setting_configtext(
-        'block_custom_openai_chatbot/model',
-        'OpenAI Model',
+        'block_custom_openai_chatbot/chat_history_api',
+        'Chat HISTORY API Endpoint',
         'Specify the OpenAI model (e.g., gpt-3.5-turbo)',
         'gpt-3.5-turbo',
         PARAM_TEXT
     ));
 
     // Max Tokens
-    $settings->add(new admin_setting_configtext(
-        'block_custom_openai_chatbot/max_tokens',
-        'Max Tokens',
-        'Set the maximum number of tokens per response.',
-        '100',
-        PARAM_INT
-    ));
+    // $settings->add(new admin_setting_configtext(
+    //     'block_custom_openai_chatbot/max_tokens',
+    //     'Max Tokens',
+    //     'Set the maximum number of tokens per response.',
+    //     '100',
+    //     PARAM_INT
+    // ));
 
     // Temperature
-    $settings->add(new admin_setting_configtext(
-        'block_custom_openai_chatbot/temperature',
-        'Temperature',
-        'Set the response randomness (0 = strict, 1 = creative).',
-        '0.7',
-        PARAM_FLOAT
-    ));
+    // $settings->add(new admin_setting_configtext(
+    //     'block_custom_openai_chatbot/temperature',
+    //     'Temperature',
+    //     'Set the response randomness (0 = strict, 1 = creative).',
+    //     '0.7',
+    //     PARAM_FLOAT
+    // ));
 
     // ✅ Ensure the settings are added only once
     if (!$ADMIN->locate('blocksettings')) {

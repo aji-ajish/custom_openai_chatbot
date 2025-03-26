@@ -15,6 +15,8 @@ function xmldb_block_custom_openai_chatbot_upgrade($oldversion) {
         $table->add_field('message', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
         $table->add_field('response', XMLDB_TYPE_TEXT, null, null, null, null, null);
         $table->add_field('response_type', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('token_request', XMLDB_TYPE_TEXT, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('token_response', XMLDB_TYPE_TEXT, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
 
         // Adding keys to table chatbot_history.

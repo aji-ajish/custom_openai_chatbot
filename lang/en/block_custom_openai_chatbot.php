@@ -22,7 +22,7 @@ $string['custom_openai_chatbot:myaddinstance'] = 'Add a new Custom OpenAI Chatbo
 
 $string['pluginname'] = 'Custom OpenAI Chatbot';
 $string['apikey'] = 'OpenAI API Key';
-$string['apiurl'] = 'OpenAI API Endpoint';
-$string['model'] = 'OpenAI Model';
-$string['max_tokens'] = 'Max Tokens';
-$string['temperature'] = 'Temperature';
+$string['process_query_api'] = 'OpenAI API Endpoint';
+$string['chat_history_api'] = 'Chat HISTORY API Endpoint';
+// $string['max_tokens'] = 'Max Tokens';
+// $string['temperature'] = 'Temperature';

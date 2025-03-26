@@ -1,18 +1,4 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
-// 
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -31,46 +17,26 @@ class block_custom_openai_chatbot extends block_base {
             'all' => false,
             'site' => true,
             'course-view' => true, 
-            'mod' => true, // Ensure this is set to allow blocks in module pages
+            'mod' => true,
         ];
     }
-    
 
-    public function get_content() {
+    public function get_content()
+    {
         global $COURSE, $USER, $CFG, $DB;
 
         if ($this->content !== null) {
             return $this->content;
         }
 
-        $course_name = isset($COURSE->fullname) ? $COURSE->shortname : 'General';
-        $course_id = isset($COURSE->fullname) ? $COURSE->id : 'General';
+        $course_id = isset($COURSE->id) ? $COURSE->id : 'General';
         $user_id = $USER->id;
+        $course_name = isset($COURSE->fullname) ? $COURSE->shortname : 'General';
 
-        // Retrieve previous chat history for the user and course
+        // Fetch chat history from DRF API
+        $history_html = $this->fetch_chat_history($user_id, $course_id);
 
-        $sql = "SELECT * FROM {chatbot_history} 
-        WHERE userid = :userid AND courseid = :courseid 
-        ORDER BY timecreated ASC";
-
-        $params = ['userid' => $USER->id, 'courseid' => $COURSE->id];
-
-        $history = $DB->get_records_sql($sql, $params);
-
-        // Display the chat history
-        $history_html = '';
-        foreach ($history as $record) {
-            $history_html .= '<div class="chat-message user-message" style="margin-top: 5px;margin-bottom: 5px;">' . format_text($record->message, FORMAT_PLAIN) . '</div>';
-            
-            if (!empty($record->response)) {
-                $history_html .= '<div class="chat-message bot-message">' . format_text($record->response, FORMAT_PLAIN) . '</div>';
-            }
-            
-        }
-        
         $this->content = new stdClass;
-
-        // Chatbot UI
         $this->content->text = '
         <div id="openai-chatbot-container">
             <div id="chat-messages">' . $history_html . '</div>
@@ -89,7 +55,100 @@ class block_custom_openai_chatbot extends block_base {
         $this->page->requires->css(new moodle_url($CFG->wwwroot . '/blocks/custom_openai_chatbot/styles.css'));
         $this->page->requires->js(new moodle_url($CFG->wwwroot . '/blocks/custom_openai_chatbot/chat.js'));
 
-
         return $this->content;
     }
+
+    private function fetch_chat_history($user_id, $course_id) {
+        global $CFG;
+    
+        $api_url = get_config('block_custom_openai_chatbot', 'chat_history_api');
+        $api_key = get_config('block_custom_openai_chatbot', 'api_key');
+    
+        $params = [
+            'user_id' => $user_id,
+            'course_id' => $course_id
+        ];
+    
+        $headers = [
+            'Authorization: Bearer ' . $api_key,
+            'Content-Type: application/json'
+        ];
+    
+        $response = $this->make_api_request($api_url, $params, $headers);
+    
+        // Debugging: Log API response
+        error_log("Chat History API Raw Response: " . print_r($response, true));
+    
+        if (!is_array($response)) {
+            error_log("Invalid API response. Expected array, got " . gettype($response));
+            return '<p>Error retrieving chat history.</p>';
+        }
+    
+        if (empty($response)) {
+            return '<p>No chat history found.</p>';
+        }
+    
+        $history_html = '';
+        foreach ($response as $record) {
+            if (!is_array($record)) {  // Ensure $record is an array
+                error_log("Invalid record format: " . print_r($record, true));
+                continue;
+            }
+    
+            $history_html .= '<div class="chat-message user-message">'
+                . format_text($record['user_query'], FORMAT_PLAIN)
+                . '<br><span class="chat-token">Req Token: ' . htmlspecialchars($record['req_token'], ENT_QUOTES) . '</span></div>';
+    
+            if (!empty($record['response'])) {
+                $history_html .= '<div class="chat-message bot-message">'
+                    . format_text($record['response'], FORMAT_PLAIN)
+                    . '<br><span class="chat-token">Res Token: ' . htmlspecialchars($record['res_token'], ENT_QUOTES) . '</span></div>';
+            }
+        }
+    
+        return $history_html;
+    }
+    
+
+
+    private function make_api_request($url, $params, $headers) {
+        $query_string = http_build_query($params, '', '&');
+        $full_url = rtrim($url, '?') . '?' . $query_string;
+    
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $full_url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+    
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    
+        if (curl_errno($ch)) {
+            error_log('CURL Error: ' . curl_error($ch));
+        }
+    
+        curl_close($ch);
+    
+        // Debugging
+        error_log("API URL: " . $full_url);
+        error_log("API Response Code: " . $http_code);
+        error_log("Raw API Response: " . print_r($response, true));
+    
+        // Check if response is valid JSON
+        $data = json_decode($response, true);
+    
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            error_log("JSON Decode Error: " . json_last_error_msg());
+            return []; // Return empty array if JSON is invalid
+        }
+    
+        if (!is_array($data)) {
+            error_log("Unexpected API response format. Expected array, got " . gettype($data));
+            return [];
+        }
+    
+        return $data;
+    }
+    
 }

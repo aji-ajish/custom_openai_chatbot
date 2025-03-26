@@ -2,10 +2,10 @@
 function block_custom_openai_chatbot_global_db_vars() {
     return array(
         'block_custom_openai_chatbot/apikey',
-        'block_custom_openai_chatbot/apiurl',
-        'block_custom_openai_chatbot/model',
-        'block_custom_openai_chatbot/max_tokens',
-        'block_custom_openai_chatbot/temperature'
+        'block_custom_openai_chatbot/process_query_api',
+        'block_custom_openai_chatbot/chat_history_api',
+        // 'block_custom_openai_chatbot/max_tokens',
+        // 'block_custom_openai_chatbot/temperature'
     );
 }
 
