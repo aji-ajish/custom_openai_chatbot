@@ -19,8 +19,8 @@ if ($hassiteconfig) { // Ensures the settings are only added once
     // OpenAI API URL
     $settings->add(new admin_setting_configtext(
         'block_custom_openai_chatbot/process_query_api',
-        'OpenAI API Endpoint',
-        'Enter the OpenAI API URL.',
+        'Chat Process Query API Endpoint',
+        'Enter the Chat Process Query API Endpoint.',
         '',
         PARAM_URL
     ));
@@ -29,8 +29,8 @@ if ($hassiteconfig) { // Ensures the settings are only added once
     $settings->add(new admin_setting_configtext(
         'block_custom_openai_chatbot/chat_history_api',
         'Chat HISTORY API Endpoint',
-        'Specify the OpenAI model (e.g., gpt-3.5-turbo)',
-        'gpt-3.5-turbo',
+        'Enter the Chat HISTORY API Endpoint',
+        '',
         PARAM_TEXT
     ));
 
